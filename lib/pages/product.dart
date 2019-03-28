@@ -1,35 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:udemy_app/widgets/products/address_tag.dart';
+import 'package:udemy_app/widgets/ui_elements/title_default.dart';
 
 class ProductPage extends StatelessWidget {
   final Map<String, dynamic> productInfo;
 
   ProductPage(this.productInfo);
-
-  void _showDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Are you sure?'),
-            content: Text('this action can not be undone'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('DISCARD'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FlatButton(
-                child: Text('DELETE'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context, true);
-                },
-              )
-            ],
-          );
-        });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,21 +18,54 @@ class ProductPage extends StatelessWidget {
         appBar: AppBar(
           title: Text(productInfo['title']),
         ),
-        body: Column(
-          children: <Widget>[
-            Image.asset(productInfo['image']),
-            Container(
-              margin: EdgeInsets.all(12),
-              child: Text(productInfo['title']),
-            ),
-            RaisedButton(
-              color: Theme.of(context).accentColor,
-              onPressed: () => _showDialog(context),
-              child: Text('DELETE'),
-            )
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Image.asset(productInfo['image']),
+              Container(
+                margin: EdgeInsets.all(12),
+                child: TitleDefault(
+                  productInfo['title'],
+                  multiline: true,
+                ),
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              _buildAddressPriceRow(),
+              SizedBox(
+                height: 10.0,
+              ),
+              Container(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  productInfo['description'],
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAddressPriceRow(){
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Flexible(
+          child: AddressTag('Tbilisi, Samtskhe-Javakheti, Georgia'),
+        ),
+        SizedBox(
+          width: 10.0,
+        ),
+        Text(
+          '\$ ' + productInfo['price'].toString(),
+          style: TextStyle(color: Colors.black),
+        ),
+        SizedBox(width: 4.0),
+      ],
     );
   }
 }

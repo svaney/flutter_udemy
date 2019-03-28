@@ -22,51 +22,64 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       margin: EdgeInsets.all(16.0),
       child: ListView(
         children: <Widget>[
-          TextField(
-            decoration: InputDecoration(labelText: 'Product Title'),
-            onChanged: (String value) {
-              setState(() {
-                _productTitle = value;
-              });
-            },
-          ),
-          TextField(
-            decoration: InputDecoration(labelText: 'Product Description'),
-            maxLines: 4,
-            onChanged: (String value) {
-              setState(() {
-                _productDescription = value;
-              });
-            },
-          ),
-          TextField(
-            decoration: InputDecoration(labelText: 'Product price'),
-            keyboardType: TextInputType.number,
-            onChanged: (String value) {
-              setState(() {
-                _productPrice = double.parse(value);
-              });
-            },
-          ),
+          _buildTitleTextField(),
+          _buildPriceTextField(),
+          _buildDescriptionTextField(),
           SizedBox(height: 10.0),
           RaisedButton(
             child: Text('Save'),
-            color: Theme.of(context).accentColor,
             textColor: Colors.white,
-            onPressed: () {
-              final Map<String, dynamic> pr = {
-                'title': _productTitle,
-                'description': _productDescription,
-                'price': _productPrice,
-                'image': 'assets/images/food.jpg'
-              };
-              widget.addProduct(pr);
-
-              Navigator.pushReplacementNamed(context, '/products');
-            },
+            onPressed: _onCreateProductClick,
           ),
         ],
       ),
+    );
+  }
+
+  void _onCreateProductClick() {
+    final Map<String, dynamic> pr = {
+      'title': _productTitle,
+      'description': _productDescription,
+      'price': _productPrice,
+      'image': 'assets/images/food.jpg'
+    };
+    widget.addProduct(pr);
+
+    Navigator.pushReplacementNamed(context, '/products');
+  }
+
+  Widget _buildTitleTextField() {
+    return TextField(
+      decoration: InputDecoration(labelText: 'Product Title'),
+      onChanged: (String value) {
+        setState(() {
+          _productTitle = value;
+        });
+      },
+    );
+  }
+
+  Widget _buildDescriptionTextField() {
+    return TextField(
+      decoration: InputDecoration(labelText: 'Product Description'),
+      maxLines: 4,
+      onChanged: (String value) {
+        setState(() {
+          _productDescription = value;
+        });
+      },
+    );
+  }
+
+  Widget _buildPriceTextField() {
+    return TextField(
+      decoration: InputDecoration(labelText: 'Product price'),
+      keyboardType: TextInputType.number,
+      onChanged: (String value) {
+        setState(() {
+          _productPrice = double.parse(value);
+        });
+      },
     );
   }
 }

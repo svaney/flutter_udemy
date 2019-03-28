@@ -3,7 +3,6 @@ import 'package:udemy_app/pages/product_crate.dart';
 import 'package:udemy_app/pages/product_list.dart';
 
 class ProductAdminPage extends StatelessWidget {
-
   final Function addProduct;
   final Function deleteProduct;
 
@@ -14,22 +13,7 @@ class ProductAdminPage extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        drawer: Drawer(
-          child: Column(
-            children: <Widget>[
-              AppBar(
-                automaticallyImplyLeading: false,
-                title: Text('Choose'),
-              ),
-              ListTile(
-                title: Text('All products'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/products');
-                },
-              ),
-            ],
-          ),
-        ),
+        drawer: _buildDrawer(context),
         appBar: AppBar(
           title: Text('Manage Products'),
           bottom: TabBar(
@@ -47,10 +31,32 @@ class ProductAdminPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            ProductCreatePage(addProduct: addProduct,),
+            ProductCreatePage(
+              addProduct: addProduct,
+            ),
             ProductListPage(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: <Widget>[
+          AppBar(
+            automaticallyImplyLeading: false,
+            title: Text('Choose'),
+          ),
+          ListTile(
+            title: Text('All products'),
+            leading: Icon(Icons.shop),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/products');
+            },
+          ),
+        ],
       ),
     );
   }

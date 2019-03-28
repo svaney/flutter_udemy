@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:udemy_app/pages/auth.dart';
 import 'package:udemy_app/pages/product.dart';
 import 'package:udemy_app/pages/product_admin.dart';
@@ -9,6 +10,7 @@ main() => runApp(MyApp());
 class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
+    // debugPaintSizeEnabled = true;
     return _MyAppState();
   }
 }
@@ -32,7 +34,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          primarySwatch: Colors.deepOrange, accentColor: Colors.purpleAccent),
+        primarySwatch: Colors.deepOrange,
+        accentColor: Colors.purpleAccent,
+        buttonColor: Colors.purpleAccent,
+      ),
       //    home: AuthPage(),
       routes: {
         '/': (BuildContext context) => AuthPage(),
