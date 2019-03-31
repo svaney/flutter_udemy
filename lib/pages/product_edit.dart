@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 
-class ProductCreatePage extends StatefulWidget {
+class ProductEditPage extends StatefulWidget {
   final Function addProduct;
+  final Function updateProduct;
+  final Map<String, dynamic> product;
 
-  ProductCreatePage({this.addProduct});
+  ProductEditPage({
+    this.addProduct,
+    this.updateProduct,
+    this.product,
+  });
 
   @override
   State<StatefulWidget> createState() {
-    return _ProductCreatePageState();
+    return _ProductEditPageState();
   }
 }
 
-class _ProductCreatePageState extends State<ProductCreatePage> {
+class _ProductEditPageState extends State<ProductEditPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final Map<String, dynamic> _formData = {
-    'title' : null,
-    'description' : null,
-    'price' : null,
+    'title': null,
+    'description': null,
+    'price': null,
     'image': 'assets/images/food.jpg',
   };
 
@@ -78,7 +84,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       decoration: InputDecoration(labelText: 'Product Description'),
       maxLines: 4,
       onSaved: (String value) {
-        _formData['description']  = value;
+        _formData['description'] = value;
       },
       validator: (String value) {
         if (value.isEmpty || value.length < 5) {
@@ -93,7 +99,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       decoration: InputDecoration(labelText: 'Product price'),
       keyboardType: TextInputType.number,
       onSaved: (String value) {
-        _formData['price']  = double.parse(value);
+        _formData['price'] = double.parse(value);
       },
       validator: (String value) {
         if (value.isEmpty ||

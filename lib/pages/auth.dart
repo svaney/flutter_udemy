@@ -10,9 +10,11 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   final GlobalKey<FormState> _authFormKey = GlobalKey<FormState>();
 
-  String _password;
-  String _email;
-  bool _acceptTerm = false;
+  final Map<String, dynamic> _formData = {
+    'password': null,
+    'email': null,
+    'acceptTerms' : false,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +74,12 @@ class _AuthPageState extends State<AuthPage> {
       ),
       keyboardType: TextInputType.emailAddress,
       onSaved: (String value) {
-        setState(() {
-          _email = value;
-        });
+        _formData['email'] = value;
       },
-      validator: (String value){
+      validator: (String value) {
         if (value.isEmpty ||
-            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").hasMatch(value)){
+            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                .hasMatch(value)) {
           return 'Please fill with valid E-mail address';
         }
       },
@@ -94,20 +95,23 @@ class _AuthPageState extends State<AuthPage> {
       ),
       obscureText: true,
       onSaved: (String value) {
-        setState(() {
-          _password = value;
-        });
+        _formData['password'] = value;
+      },
+      validator: (String value) {
+        if (value.isEmpty || value.length < 4) {
+          return 'Password should be at least 4 characters';
+        }
       },
     );
   }
 
   Widget _buildAcceptTerms() {
     return SwitchListTile(
-      value: _acceptTerm,
+      value: _formData['acceptTerms'],
       title: Text('Accept Terms'),
       onChanged: (bool value) {
         setState(() {
-          _acceptTerm = value;
+          _formData['acceptTerms'] = value;
         });
       },
     );
@@ -123,6 +127,10 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   void _onLoginClick() {
+    if (!_authFormKey.currentState.validate() || !_formData['acceptTerms']) {
+      return;
+    }
+    _authFormKey.currentState.save();
     Navigator.pushReplacementNamed(context, '/products');
   }
 }
