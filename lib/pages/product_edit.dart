@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:udemy_app/models/product.dart';
 
 class ProductEditPage extends StatefulWidget {
   final Function addProduct;
   final Function updateProduct;
-  final Map<String, dynamic> product;
+  final int index;
+  final Product product;
 
   ProductEditPage({
     this.addProduct,
     this.updateProduct,
     this.product,
+    this.index,
   });
 
   @override
@@ -29,6 +32,17 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    return widget.product == null
+        ? _buildPage()
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('Edit Product'),
+            ),
+            body: _buildPage(),
+          );
+  }
+
+  Widget _buildPage() {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -60,7 +74,27 @@ class _ProductEditPageState extends State<ProductEditPage> {
       return;
     }
     _formKey.currentState.save();
-    widget.addProduct(_formData);
+
+    if (widget.product == null) {
+      widget.addProduct(
+        Product(
+          title: _formData['title'],
+          price: _formData['price'],
+          image: _formData['image'],
+          description: _formData['description'],
+        ),
+      );
+    } else {
+      widget.updateProduct(
+        widget.index,
+        Product(
+          title: _formData['title'],
+          price: _formData['price'],
+          image: _formData['image'],
+          description: _formData['description'],
+        ),
+      );
+    }
 
     Navigator.pushReplacementNamed(context, '/products');
   }
@@ -68,6 +102,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget _buildTitleTextField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Title'),
+      initialValue: widget.product == null ? '' : widget.product.title,
       onSaved: (String value) {
         _formData['title'] = value;
       },
@@ -83,6 +118,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Description'),
       maxLines: 4,
+      initialValue: widget.product == null ? '' : widget.product.description,
       onSaved: (String value) {
         _formData['description'] = value;
       },
@@ -98,6 +134,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product price'),
       keyboardType: TextInputType.number,
+      initialValue:
+          widget.product == null ? '' : widget.product.price.toString(),
       onSaved: (String value) {
         _formData['price'] = double.parse(value);
       },

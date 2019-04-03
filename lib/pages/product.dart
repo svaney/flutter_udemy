@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/widgets/products/address_tag.dart';
 import 'package:udemy_app/widgets/ui_elements/title_default.dart';
 
 class ProductPage extends StatelessWidget {
-  final Map<String, dynamic> productInfo;
+  final Product product;
 
-  ProductPage(this.productInfo);
+  ProductPage(this.product);
 
   @override
   Widget build(BuildContext context) {
@@ -16,16 +17,16 @@ class ProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(productInfo['title']),
+          title: Text(product.title),
         ),
         body: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              Image.asset(productInfo['image']),
+              Image.asset(product.image),
               Container(
                 margin: EdgeInsets.all(12),
                 child: TitleDefault(
-                  productInfo['title'],
+                  product.title,
                   multiline: true,
                 ),
               ),
@@ -39,7 +40,7 @@ class ProductPage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
-                  productInfo['description'],
+                  product.description,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -50,8 +51,8 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAddressPriceRow(){
-    return  Row(
+  Widget _buildAddressPriceRow() {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Flexible(
@@ -61,7 +62,7 @@ class ProductPage extends StatelessWidget {
           width: 10.0,
         ),
         Text(
-          '\$ ' + productInfo['price'].toString(),
+          '\$ ' + product.price.toString(),
           style: TextStyle(color: Colors.black),
         ),
         SizedBox(width: 4.0),

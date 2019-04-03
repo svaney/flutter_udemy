@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/pages/auth.dart';
 import 'package:udemy_app/pages/product.dart';
 import 'package:udemy_app/pages/product_admin.dart';
@@ -16,11 +17,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Map<String, dynamic>> _products = [];
+  List<Product> _products = [];
 
-  void _addProduct(Map<String, dynamic> product) {
+  void _addProduct(Product product) {
     setState(() {
       _products.add(product);
+    });
+  }
+
+  void _updateProduct(int index, Product product) {
+    setState(() {
+      _products[index] = product;
     });
   }
 
@@ -42,11 +49,11 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (BuildContext context) => AuthPage(),
         '/products': (BuildContext context) => ProductsPage(_products),
-        '/admin': (BuildContext context) =>
-            ProductAdminPage(
+        '/admin': (BuildContext context) => ProductAdminPage(
               addProduct: _addProduct,
               deleteProduct: _deleteProduct,
               products: _products,
+              updateProduct: _updateProduct,
             ),
       },
       onGenerateRoute: (RouteSettings settings) {
