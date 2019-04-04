@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
+import 'package:udemy_app/scoped-models/products.dart';
 import 'package:udemy_app/widgets/products/address_tag.dart';
 import 'package:udemy_app/widgets/ui_elements/title_default.dart';
 
 class ProductPage extends StatelessWidget {
-  final Product product;
+  final int index;
 
-  ProductPage(this.product);
+  ProductPage(this.index);
 
   @override
   Widget build(BuildContext context) {
@@ -15,43 +17,48 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(product.title),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Image.asset(product.image),
-              Container(
-                margin: EdgeInsets.all(12),
-                child: TitleDefault(
-                  product.title,
-                  multiline: true,
-                ),
+      child: ScopedModelDescendant<ProductsModel>(
+        builder: (BuildContext context, Widget child, ProductsModel model) {
+          Product product = model.products[index];
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(product.title),
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Image.asset(product.image),
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    child: TitleDefault(
+                      product.title,
+                      multiline: true,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  _buildAddressPriceRow(product.price),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      product.description,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 10.0,
-              ),
-              _buildAddressPriceRow(),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  product.description,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildAddressPriceRow() {
+  Widget _buildAddressPriceRow(double price) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -62,7 +69,7 @@ class ProductPage extends StatelessWidget {
           width: 10.0,
         ),
         Text(
-          '\$ ' + product.price.toString(),
+          '\$ ' + price.toString(),
           style: TextStyle(color: Colors.black),
         ),
         SizedBox(width: 4.0),

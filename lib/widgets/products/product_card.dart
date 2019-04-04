@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
+import 'package:udemy_app/scoped-models/products.dart';
 import 'package:udemy_app/widgets/products/address_tag.dart';
 import 'package:udemy_app/widgets/products/price_tag.dart';
 import 'package:udemy_app/widgets/ui_elements/title_default.dart';
@@ -46,23 +48,32 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.info),
-          color: Theme.of(context).primaryColor,
-          onPressed: () => Navigator.pushNamed(
-                context,
-                '/product/' + productIndex.toString(),
-              ),
-        ),
-        IconButton(
-          icon: Icon(Icons.favorite_border),
-          color: Theme.of(context).accentColor,
-          onPressed: () {},
-        ),
-      ],
+    return ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        return ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.info),
+              color: Theme.of(context).primaryColor,
+              onPressed: () => Navigator.pushNamed(
+                    context,
+                    '/product/' + productIndex.toString(),
+                  ),
+            ),
+            IconButton(
+              icon: Icon(model.products[productIndex].isFavorite
+                  ? Icons.favorite
+                  : Icons.favorite_border),
+              color: Theme.of(context).accentColor,
+              onPressed: () {
+                model.setSelectedProductIndex(productIndex);
+                model.toggleProductFavorite();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -4,18 +4,6 @@ import 'package:udemy_app/pages/product_edit.dart';
 import 'package:udemy_app/pages/product_list.dart';
 
 class ProductAdminPage extends StatelessWidget {
-  final Function addProduct;
-  final Function deleteProduct;
-  final Function updateProduct;
-
-  final List<Product> products;
-
-  ProductAdminPage({
-    this.addProduct,
-    this.updateProduct,
-    this.deleteProduct,
-    this.products,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +28,8 @@ class ProductAdminPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            ProductEditPage(addProduct: addProduct),
-            ProductListPage(products, updateProduct, deleteProduct),
+            ProductEditPage(),
+            ProductListPage(),
           ],
         ),
       ),
