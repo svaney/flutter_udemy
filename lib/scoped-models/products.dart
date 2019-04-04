@@ -1,57 +1,71 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
+import 'package:udemy_app/scoped-models/ConnectedProducts.dart';
 
-class ProductsModel extends Model {
-  List<Product> _products = [];
+mixin ProductsModel on ConnectedProducts {
 
-  int _selectedProductIndex;
 
-  List<Product> get products {
-    return List.from(_products);
+  bool _showFavorites = false;
+
+
+  List<Product> get allProducts {
+    return List.from(products);
   }
 
-  void addProduct(Product product) {
-    _products.add(product);
-    setSelectedProductIndex(null);
-    notifyListeners();
+  List<Product> get displayedProducts {
+    if (_showFavorites){
+      return products.where((Product product) => product.isFavorite).toList();
+    }
+    return List.from(products);
   }
 
   void updateProduct(Product product) {
-    _products[_selectedProductIndex] = product;
+    products[selProductIndex] = product;
     setSelectedProductIndex(null);
     notifyListeners();
   }
 
   void deleteProduct() {
-    _products.removeAt(_selectedProductIndex);
+    products.removeAt(selProductIndex);
     setSelectedProductIndex(null);
     notifyListeners();
   }
 
   void setSelectedProductIndex(int value) {
-    _selectedProductIndex = value;
+    selProductIndex = value;
+    notifyListeners();
   }
 
   int getSelectedProductIndex() {
-    return _selectedProductIndex;
+    return selProductIndex;
   }
 
   Product getSelectedProduct() {
-    return _selectedProductIndex != null
-        ? products[_selectedProductIndex]
+    return selProductIndex != null
+        ? allProducts[selProductIndex]
         : null;
   }
 
+  void toggleFavorites(){
+    _showFavorites = ! _showFavorites;
+    notifyListeners();
+    selProductIndex = null;
+  }
+
+  bool get displayFavorites {
+    return _showFavorites;
+  }
+
   void toggleProductFavorite() {
-    Product currProduct = _products[_selectedProductIndex];
+    Product currProduct = products[selProductIndex];
     final Product newProduct = Product(
         title: currProduct.title,
         image: currProduct.image,
         description: currProduct.description,
         price: currProduct.price,
         isFavorite: !currProduct.isFavorite);
-    _products[_selectedProductIndex] = newProduct;
-    _selectedProductIndex = null;
+    products[selProductIndex] = newProduct;
+    selProductIndex = null;
     notifyListeners();
   }
 }

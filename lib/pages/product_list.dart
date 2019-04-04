@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/pages/product_edit.dart';
+import 'package:udemy_app/scoped-models/main.dart';
 import 'package:udemy_app/scoped-models/products.dart';
 
 class ProductListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(
-              key: Key(model.products[index].title),
+              key: Key(model.allProducts[index].title),
               background: Container(color: Colors.red),
               onDismissed: (DismissDirection direction) {
                 model.setSelectedProductIndex(index);
@@ -26,26 +27,26 @@ class ProductListPage extends StatelessWidget {
               ),
             );
           },
-          itemCount: model.products.length,
+          itemCount: model.allProducts.length,
         );
       },
     );
   }
 
-  Widget _buildListItem(BuildContext context, int index, ProductsModel model) {
+  Widget _buildListItem(BuildContext context, int index, MainModel model) {
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: AssetImage(
-          model.products[index].image,
+          model.allProducts[index].image,
         ),
       ),
-      title: Text(model.products[index].title),
-      subtitle: Text('\$ ' + model.products[index].price.toString()),
+      title: Text(model.allProducts[index].title),
+      subtitle: Text('\$ ' + model.allProducts[index].price.toString()),
       trailing: _buildEdictIconButton(index, context, model),
     );
   }
 
-  Widget _buildEdictIconButton(int index, BuildContext context, ProductsModel model) {
+  Widget _buildEdictIconButton(int index, BuildContext context, MainModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {

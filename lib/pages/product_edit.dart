@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
+import 'package:udemy_app/scoped-models/main.dart';
 import 'package:udemy_app/scoped-models/products.dart';
 
 class ProductEditPage extends StatefulWidget {
@@ -22,8 +23,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         Product product = model.getSelectedProduct();
         return product == null
             ? _buildPage(product, model)
@@ -37,7 +38,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
-  Widget _buildPage(Product product, ProductsModel model) {
+  Widget _buildPage(Product product, MainModel model) {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -60,7 +61,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
-  Widget _buildSubmitButton(Product product, ProductsModel model) {
+  Widget _buildSubmitButton(Product product, MainModel model) {
     return RaisedButton(
       child: Text('Save'),
       textColor: Colors.white,
@@ -68,7 +69,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
-  void _onCreateProductClick(Product product, ProductsModel model) {
+  void _onCreateProductClick(Product product, MainModel model) {
     if (!_formKey.currentState.validate()) {
       return;
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
+import 'package:udemy_app/scoped-models/main.dart';
 import 'package:udemy_app/scoped-models/products.dart';
 import 'package:udemy_app/widgets/products/address_tag.dart';
 import 'package:udemy_app/widgets/products/price_tag.dart';
@@ -48,8 +49,8 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return ButtonBar(
           alignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -62,7 +63,7 @@ class ProductCard extends StatelessWidget {
                   ),
             ),
             IconButton(
-              icon: Icon(model.products[productIndex].isFavorite
+              icon: Icon(model.allProducts[productIndex].isFavorite
                   ? Icons.favorite
                   : Icons.favorite_border),
               color: Theme.of(context).accentColor,

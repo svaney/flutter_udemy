@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/pages/product_edit.dart';
 import 'package:udemy_app/pages/product_list.dart';
 

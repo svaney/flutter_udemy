@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
+import 'package:udemy_app/scoped-models/main.dart';
 import 'package:udemy_app/scoped-models/products.dart';
 import 'package:udemy_app/widgets/products/address_tag.dart';
 import 'package:udemy_app/widgets/ui_elements/title_default.dart';
@@ -17,9 +18,9 @@ class ProductPage extends StatelessWidget {
         Navigator.pop(context, false);
         return Future.value(false);
       },
-      child: ScopedModelDescendant<ProductsModel>(
-        builder: (BuildContext context, Widget child, ProductsModel model) {
-          Product product = model.products[index];
+      child: ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+          Product product = model.allProducts[index];
           return Scaffold(
             appBar: AppBar(
               title: Text(product.title),

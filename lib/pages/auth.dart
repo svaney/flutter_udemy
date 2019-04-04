@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:udemy_app/scoped-models/main.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class _AuthPageState extends State<AuthPage> {
   final Map<String, dynamic> _formData = {
     'password': null,
     'email': null,
-    'acceptTerms' : false,
+    'acceptTerms': false,
   };
 
   @override
@@ -118,19 +120,24 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   Widget _buildLoginButton() {
-    return RaisedButton(
-      child: Text('Login'),
-      color: Theme.of(context).primaryColor,
-      textColor: Colors.white,
-      onPressed: _onLoginClick,
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return RaisedButton(
+          child: Text('Login'),
+          color: Theme.of(context).primaryColor,
+          textColor: Colors.white,
+          onPressed: () => _onLoginClick(model.login),
+        );
+      },
     );
   }
 
-  void _onLoginClick() {
+  void _onLoginClick(Function modelLogin) {
     if (!_authFormKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _authFormKey.currentState.save();
+    modelLogin(_formData['email'], _formData['password']);
     Navigator.pushReplacementNamed(context, '/products');
   }
 }
