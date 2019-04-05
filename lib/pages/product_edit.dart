@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/scoped-models/main.dart';
-import 'package:udemy_app/scoped-models/products.dart';
 
 class ProductEditPage extends StatefulWidget {
   @override
@@ -77,25 +76,21 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
     if (product == null) {
       model.addProduct(
-        Product(
           title: _formData['title'],
           price: _formData['price'],
           image: _formData['image'],
-          description: _formData['description'],
-        ),
+          desc: _formData['description'],
       );
     } else {
       model.updateProduct(
-        Product(
           title: _formData['title'],
           price: _formData['price'],
           image: _formData['image'],
-          description: _formData['description'],
-        ),
+          desc: _formData['description'],
       );
     }
 
-    Navigator.pushReplacementNamed(context, '/products');
+    Navigator.pushReplacementNamed(context, '/products').then((_) => model.setSelectedProductIndex(null));
   }
 
   Widget _buildTitleTextField(Product product) {

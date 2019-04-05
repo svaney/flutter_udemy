@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/pages/product_edit.dart';
 import 'package:udemy_app/scoped-models/main.dart';
-import 'package:udemy_app/scoped-models/products.dart';
 
 class ProductListPage extends StatelessWidget {
   @override
@@ -51,18 +49,20 @@ class ProductListPage extends StatelessWidget {
       icon: Icon(Icons.edit),
       onPressed: () {
         model.setSelectedProductIndex(index);
-        _onEditClick(context);
+        _onEditClick(context, model);
       },
     );
   }
 
-  void _onEditClick(BuildContext context) {
+  void _onEditClick(BuildContext context, MainModel model) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
           return ProductEditPage();
         },
       ),
-    );
+    ).then((_) {
+      model.setSelectedProductIndex(null);
+    });;
   }
 }

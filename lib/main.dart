@@ -5,7 +5,6 @@ import 'package:udemy_app/pages/product.dart';
 import 'package:udemy_app/pages/product_admin.dart';
 import 'package:udemy_app/pages/products.dart';
 import 'package:udemy_app/scoped-models/main.dart';
-import 'package:udemy_app/scoped-models/products.dart';
 
 main() => runApp(MyApp());
 

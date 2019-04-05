@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/scoped-models/main.dart';
-import 'package:udemy_app/scoped-models/products.dart';
 import 'package:udemy_app/widgets/products/address_tag.dart';
 import 'package:udemy_app/widgets/ui_elements/title_default.dart';
 
