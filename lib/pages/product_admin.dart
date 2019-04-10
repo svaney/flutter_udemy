@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:udemy_app/pages/product_edit.dart';
 import 'package:udemy_app/pages/product_list.dart';
+import 'package:udemy_app/scoped-models/main.dart';
 
 class ProductAdminPage extends StatelessWidget {
+  final MainModel model;
+
+  ProductAdminPage(this.model);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +32,7 @@ class ProductAdminPage extends StatelessWidget {
         body: TabBarView(
           children: <Widget>[
             ProductEditPage(),
-            ProductListPage(),
+            ProductListPage(model),
           ],
         ),
       ),

@@ -61,11 +61,13 @@ class _ProductEditPageState extends State<ProductEditPage> {
   }
 
   Widget _buildSubmitButton(Product product, MainModel model) {
-    return RaisedButton(
-      child: Text('Save'),
-      textColor: Colors.white,
-      onPressed: () => _onCreateProductClick(product, model),
-    );
+    return model.isLoading
+        ? Center(child: CircularProgressIndicator())
+        : RaisedButton(
+            child: Text('Save'),
+            textColor: Colors.white,
+            onPressed: () => _onCreateProductClick(product, model),
+          );
   }
 
   void _onCreateProductClick(Product product, MainModel model) {
@@ -76,21 +78,27 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
     if (product == null) {
       model.addProduct(
-          title: _formData['title'],
-          price: _formData['price'],
-          image: _formData['image'],
-          desc: _formData['description'],
-      );
+        title: _formData['title'],
+        price: _formData['price'],
+        image: _formData['image'],
+        desc: _formData['description'],
+      ).then((_){
+        Navigator.pushReplacementNamed(context, '/products')
+            .then((_) => model.setSelectedProductIndex(null));
+      });
     } else {
       model.updateProduct(
-          title: _formData['title'],
-          price: _formData['price'],
-          image: _formData['image'],
-          desc: _formData['description'],
-      );
+        title: _formData['title'],
+        price: _formData['price'],
+        image: _formData['image'],
+        desc: _formData['description'],
+      ).then((_){
+        Navigator.pushReplacementNamed(context, '/products')
+            .then((_) => model.setSelectedProductIndex(null));
+      });
     }
 
-    Navigator.pushReplacementNamed(context, '/products').then((_) => model.setSelectedProductIndex(null));
+
   }
 
   Widget _buildTitleTextField(Product product) {

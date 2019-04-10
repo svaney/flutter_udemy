@@ -3,7 +3,24 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/scoped-models/main.dart';
 import 'package:udemy_app/widgets/products/products.dart';
 
-class ProductsPage extends StatelessWidget {
+class ProductsPage extends StatefulWidget {
+  final MainModel model;
+
+  ProductsPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    return ProductsPageState();
+  }
+}
+
+class ProductsPageState extends State<ProductsPage> {
+  @override
+  void initState() {
+    super.initState();
+    widget.model.fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +42,7 @@ class ProductsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Products(),
+      body: _buildProductList(),
     );
   }
 
@@ -47,5 +64,32 @@ class ProductsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildProductList() {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget content = model.isLoading
+            ? _buildLoader()
+            : (model.displayedProducts.length == 0
+                ? _buildNoProductsWidget()
+                : Products());
+
+        return RefreshIndicator(onRefresh: model.fetchProducts, child: content);
+      },
+    );
+  }
+
+  Widget _buildNoProductsWidget() {
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
+        children: <Widget>[Center(child: Text('No Products Found'))],
+      ),
+    );
+  }
+
+  Widget _buildLoader() {
+    return Center(child: CircularProgressIndicator());
   }
 }

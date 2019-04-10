@@ -3,7 +3,25 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/pages/product_edit.dart';
 import 'package:udemy_app/scoped-models/main.dart';
 
-class ProductListPage extends StatelessWidget {
+class ProductListPage extends StatefulWidget {
+  final MainModel model;
+
+  ProductListPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    return ProductListPageState();
+  }
+}
+
+class ProductListPageState extends State<ProductListPage>{
+
+  @override
+  void initState() {
+    super.initState();
+    widget.model.fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -11,11 +29,12 @@ class ProductListPage extends StatelessWidget {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(
-              key: Key(model.allProducts[index].title),
+              key: Key(model.allProducts[index].id),
               background: Container(color: Colors.red),
               onDismissed: (DismissDirection direction) {
                 model.setSelectedProductIndex(index);
                 model.deleteProduct();
+                model.setSelectedProductIndex(null);
               },
               child: Column(
                 children: <Widget>[
@@ -34,7 +53,7 @@ class ProductListPage extends StatelessWidget {
   Widget _buildListItem(BuildContext context, int index, MainModel model) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: AssetImage(
+        backgroundImage: NetworkImage(
           model.allProducts[index].image,
         ),
       ),

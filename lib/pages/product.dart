@@ -27,7 +27,7 @@ class ProductPage extends StatelessWidget {
             body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Image.asset(product.image),
+                  Image.network(product.image),
                   Container(
                     margin: EdgeInsets.all(12),
                     child: TitleDefault(
