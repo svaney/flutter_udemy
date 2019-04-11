@@ -7,10 +7,10 @@ import 'dart:convert';
 mixin ConnectedProductsModel on Model {
   List<Product> _products = [];
   User _authenticatedUser;
-  int _selProductIndex;
+  String _selectedProductId;
   bool _isLoading = false;
 
-  Future<Null> addProduct(
+  Future<bool> addProduct(
       {String title, String desc, String image, double price}) {
     _isLoading = true;
     notifyListeners();
@@ -28,6 +28,13 @@ mixin ConnectedProductsModel on Model {
             body: json.encode(productData))
         .then(
       (http.Response resp) {
+
+        if (resp.statusCode != 200 && resp.statusCode != 201){
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
+
         final Map<String, dynamic> responseData = json.decode(resp.body);
         Product pr = Product(
             id: responseData['name'],
@@ -38,11 +45,16 @@ mixin ConnectedProductsModel on Model {
             userId: _authenticatedUser.id,
             userEmail: _authenticatedUser.email);
         _products.add(pr);
-        _selProductIndex = null;
+        _selectedProductId = null;
         _isLoading = false;
         notifyListeners();
+        return true;
       },
-    );
+    ).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
   }
 }
 
@@ -66,7 +78,7 @@ mixin ProductsModel on ConnectedProductsModel {
     return List.from(_products);
   }
 
-  Future<Null> updateProduct(
+  Future<bool> updateProduct(
       {String title, String desc, String image, double price}) {
     _isLoading = true;
     notifyListeners();
@@ -87,15 +99,22 @@ mixin ProductsModel on ConnectedProductsModel {
         .then((http.Response resp) {
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  void deleteProduct() {
+  Future<bool> deleteProduct() {
     _isLoading = true;
 
     final String id = getSelectedProduct().id;
 
-    _products.removeAt(_selProductIndex);
+    _products.removeWhere((Product product) {
+      return product.id == id;
+    });
 
     notifyListeners();
 
@@ -104,22 +123,31 @@ mixin ProductsModel on ConnectedProductsModel {
         .then((http.Response resp) {
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  void setSelectedProductIndex(int value) {
-    _selProductIndex = value;
-    if (_selProductIndex != null) {
+  void selectedProduct(String productId) {
+    _selectedProductId = productId;
+    if (_selectedProductId != null) {
       notifyListeners();
     }
   }
 
-  int getSelectedProductIndex() {
-    return _selProductIndex;
+  String getSelectedProductID() {
+    return _selectedProductId;
   }
 
   Product getSelectedProduct() {
-    return _selProductIndex != null ? allProducts[_selProductIndex] : null;
+    return _selectedProductId != null
+        ? allProducts.firstWhere((Product product) {
+            return product.id == _selectedProductId;
+          })
+        : null;
   }
 
   void toggleFavorites() {
@@ -134,6 +162,7 @@ mixin ProductsModel on ConnectedProductsModel {
   void toggleProductFavorite() {
     Product currProduct = getSelectedProduct();
     final Product newProduct = Product(
+        id: currProduct.id,
         title: currProduct.title,
         image: currProduct.image,
         description: currProduct.description,
@@ -141,21 +170,28 @@ mixin ProductsModel on ConnectedProductsModel {
         isFavorite: !currProduct.isFavorite,
         userId: currProduct.userId,
         userEmail: currProduct.userEmail);
-    _products[_selProductIndex] = newProduct;
+    _products[selectedProductIndex] = newProduct;
     notifyListeners();
   }
 
-  Future<Null> fetchProducts() {
+  int get selectedProductIndex {
+    return _products.indexWhere((Product pr) {
+      return pr.id == _selectedProductId;
+    });
+  }
+
+  Future<bool> fetchProducts() {
     _isLoading = true;
     notifyListeners();
     return http.get('https://udemyapp-ece26.firebaseio.com/products.json').then(
       (http.Response resp) {
+
         final Map<String, dynamic> productListData = json.decode(resp.body);
 
         if (productListData == null) {
           _isLoading = false;
           notifyListeners();
-          return;
+          return false;
         }
 
         List<Product> fetchedList = [];
@@ -174,8 +210,14 @@ mixin ProductsModel on ConnectedProductsModel {
         _products = fetchedList;
         _isLoading = false;
         notifyListeners();
+        _selectedProductId = null;
+        return true;
       },
-    );
+    ).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    });
   }
 }
 

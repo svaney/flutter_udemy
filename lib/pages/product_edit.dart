@@ -25,7 +25,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Product product = model.getSelectedProduct();
-        return product == null
+        return model.selectedProductIndex == -1
             ? _buildPage(product, model)
             : Scaffold(
                 appBar: AppBar(
@@ -76,29 +76,38 @@ class _ProductEditPageState extends State<ProductEditPage> {
     }
     _formKey.currentState.save();
 
-    if (product == null) {
-      model.addProduct(
+    if (model.selectedProductIndex == -1) {
+      model
+          .addProduct(
         title: _formData['title'],
         price: _formData['price'],
         image: _formData['image'],
         desc: _formData['description'],
-      ).then((_){
-        Navigator.pushReplacementNamed(context, '/products')
-            .then((_) => model.setSelectedProductIndex(null));
+      )
+          .then((bool success) {
+            if (success) {
+              Navigator.pushReplacementNamed(context, '/products').then((_) {
+                model.selectedProduct(null);
+              });
+            } else {
+              showDialog(context: context, builder: (BuildContext context){
+                return AlertDialog(title: Text('something went wrong'), content: Text('please try again'),);
+              });
+            }
       });
     } else {
-      model.updateProduct(
+      model
+          .updateProduct(
         title: _formData['title'],
         price: _formData['price'],
         image: _formData['image'],
         desc: _formData['description'],
-      ).then((_){
+      )
+          .then((_) {
         Navigator.pushReplacementNamed(context, '/products')
-            .then((_) => model.setSelectedProductIndex(null));
+            .then((_) => model.selectedProduct(null));
       });
     }
-
-
   }
 
   Widget _buildTitleTextField(Product product) {

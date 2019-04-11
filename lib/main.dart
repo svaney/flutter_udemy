@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/pages/auth.dart';
 import 'package:udemy_app/pages/product.dart';
 import 'package:udemy_app/pages/product_admin.dart';
@@ -40,9 +41,13 @@ class _MyAppState extends State<MyApp> {
           }
 
           if (pathElements[1] == 'product') {
-            final int index = int.parse(pathElements[2]);
+            String productId = pathElements[2];
+            model.selectedProduct(productId);
             return MaterialPageRoute<bool>(
-              builder: (BuildContext context) => ProductPage(index),
+              builder: (BuildContext context) =>
+                  ProductPage(model.allProducts.firstWhere((Product pr) {
+                    return pr.id == productId;
+                  })),
             );
           }
 

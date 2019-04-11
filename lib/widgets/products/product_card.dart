@@ -62,7 +62,7 @@ class ProductCard extends StatelessWidget {
               color: Theme.of(context).primaryColor,
               onPressed: () => Navigator.pushNamed(
                     context,
-                    '/product/' + productIndex.toString(),
+                    '/product/' + model.allProducts[productIndex].id,
                   ),
             ),
             IconButton(
@@ -71,7 +71,7 @@ class ProductCard extends StatelessWidget {
                   : Icons.favorite_border),
               color: Theme.of(context).accentColor,
               onPressed: () {
-                model.setSelectedProductIndex(productIndex);
+                model.selectedProduct(model.allProducts[productIndex].id);
                 model.toggleProductFavorite();
               },
             ),

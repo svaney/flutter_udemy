@@ -32,9 +32,9 @@ class ProductListPageState extends State<ProductListPage>{
               key: Key(model.allProducts[index].id),
               background: Container(color: Colors.red),
               onDismissed: (DismissDirection direction) {
-                model.setSelectedProductIndex(index);
+                model.selectedProduct(model.allProducts[index].id);
                 model.deleteProduct();
-                model.setSelectedProductIndex(null);
+                model.selectedProduct(null);
               },
               child: Column(
                 children: <Widget>[
@@ -67,7 +67,7 @@ class ProductListPageState extends State<ProductListPage>{
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
-        model.setSelectedProductIndex(index);
+        model.selectedProduct(model.allProducts[index].id);
         _onEditClick(context, model);
       },
     );
@@ -81,7 +81,7 @@ class ProductListPageState extends State<ProductListPage>{
         },
       ),
     ).then((_) {
-      model.setSelectedProductIndex(null);
+      model.selectedProduct(null);
     });;
   }
 }
