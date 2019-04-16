@@ -82,6 +82,6 @@ class ProductListPageState extends State<ProductListPage>{
       ),
     ).then((_) {
       model.selectedProduct(null);
-    });;
+    });
   }
 }

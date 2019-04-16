@@ -9,8 +9,15 @@ class AuthPage extends StatefulWidget {
   }
 }
 
+enum AuthMode {
+  SignUp,
+  Login,
+}
+
 class _AuthPageState extends State<AuthPage> {
   final GlobalKey<FormState> _authFormKey = GlobalKey<FormState>();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
 
   final Map<String, dynamic> _formData = {
     'password': null,
@@ -43,7 +50,22 @@ class _AuthPageState extends State<AuthPage> {
                     SizedBox(height: 10.0),
                     _buildPasswordField(),
                     SizedBox(height: 10.0),
+                    _authMode == AuthMode.Login
+                        ? Container()
+                        : _buildPasswordConfirmTextField(),
+                    SizedBox(height: 10.0),
                     _buildAcceptTerms(),
+                    FlatButton(
+                      child: Text(
+                          'Switch to ${_authMode == AuthMode.Login ? 'Sign Up' : 'Login'}'),
+                      onPressed: () {
+                        setState(() {
+                          _authMode = _authMode == AuthMode.Login
+                              ? AuthMode.SignUp
+                              : AuthMode.Login;
+                        });
+                      },
+                    ),
                     SizedBox(height: 10.0),
                     _buildLoginButton(),
                   ],
@@ -96,12 +118,32 @@ class _AuthPageState extends State<AuthPage> {
         fillColor: Colors.white,
       ),
       obscureText: true,
+      controller: _passwordTextController,
       onSaved: (String value) {
         _formData['password'] = value;
       },
       validator: (String value) {
-        if (value.isEmpty || value.length < 4) {
-          return 'Password should be at least 4 characters';
+        if (value.isEmpty || value.length < 6) {
+          return 'Password should be at least 6 characters';
+        }
+      },
+    );
+  }
+
+  Widget _buildPasswordConfirmTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'Confirm Password',
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      obscureText: true,
+      onSaved: (String value) {
+        _formData['password'] = value;
+      },
+      validator: (String value) {
+        if (value != _passwordTextController.text) {
+          return 'Passwords should match each other';
         }
       },
     );
@@ -122,22 +164,49 @@ class _AuthPageState extends State<AuthPage> {
   Widget _buildLoginButton() {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return RaisedButton(
-          child: Text('Login'),
-          color: Theme.of(context).primaryColor,
-          textColor: Colors.white,
-          onPressed: () => _onLoginClick(model.login),
-        );
+        return model.isLoading
+            ? CircularProgressIndicator()
+            : RaisedButton(
+                child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
+                color: Theme.of(context).primaryColor,
+                textColor: Colors.white,
+                onPressed: () => _onLoginClick(model.login, model.signUp),
+              );
       },
     );
   }
 
-  void _onLoginClick(Function modelLogin) {
+  void _onLoginClick(Function modelLogin, Function signUp) async {
     if (!_authFormKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _authFormKey.currentState.save();
-    modelLogin(_formData['email'], _formData['password']);
-    Navigator.pushReplacementNamed(context, '/products');
+
+    Map<String, dynamic> responseInfo;
+
+    if (_authMode == AuthMode.Login) {
+      responseInfo =  await modelLogin(_formData['email'], _formData['password']);
+    } else {
+      responseInfo =  await signUp(_formData['email'], _formData['password']);
+    }
+
+    if (responseInfo['success']) {
+      Navigator.pushReplacementNamed(context, '/products');
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('An error occured'),
+            content: Text(responseInfo['message']),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text('OK'),
+                  onPressed: () => Navigator.of(context).pop()),
+            ],
+          );
+        },
+      );
+    }
   }
 }

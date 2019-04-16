@@ -28,8 +28,7 @@ mixin ConnectedProductsModel on Model {
             body: json.encode(productData))
         .then(
       (http.Response resp) {
-
-        if (resp.statusCode != 200 && resp.statusCode != 201){
+        if (resp.statusCode != 200 && resp.statusCode != 201) {
           _isLoading = false;
           notifyListeners();
           return false;
@@ -59,8 +58,69 @@ mixin ConnectedProductsModel on Model {
 }
 
 mixin UserModel on ConnectedProductsModel {
-  void login(String email, String password) {
-    _authenticatedUser = User(id: "asdasd", email: email, password: password);
+
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> authData = {
+      'password': password,
+      'email': email,
+      'returnSecureToken': true,
+    };
+
+    final http.Response response = await http.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyATiPq_9ApdebJbaJAzqlftwvAi7kM3GrE',
+        body: json.encode(authData),
+        headers: {'Content-Type': 'application/json'});
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    bool hasError = true;
+    String message = 'Somwthing went weong';
+    if (responseData.containsKey('idToken')) {
+      hasError = false;
+      message = 'Auth succeeded!';
+    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
+      message = 'no email found';
+    } else  if (responseData['error']['message'] == 'INVALID_PASSWORD') {
+      message = 'incorrect password';
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return {'success': !hasError, 'message': message};
+
+    // _authenticatedUser = User(id: "asdasd", email: email, password: password);
+  }
+
+  Future<Map<String, dynamic>> signUp(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> authData = {
+      'password': password,
+      'email': email,
+      'returnSecureToken': true,
+    };
+
+    final http.Response response = await http.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyATiPq_9ApdebJbaJAzqlftwvAi7kM3GrE',
+        body: json.encode(authData),
+        headers: {'Content-Type': 'application/json'});
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+
+    bool hasError = true;
+    String message = 'Somwthing went weong';
+    if (responseData.containsKey('idToken')) {
+      hasError = false;
+      message = 'Auth succeeded!';
+    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+      message = 'this emali already exists';
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return {'success': !hasError, 'message': message};
   }
 }
 
@@ -185,7 +245,6 @@ mixin ProductsModel on ConnectedProductsModel {
     notifyListeners();
     return http.get('https://udemyapp-ece26.firebaseio.com/products.json').then(
       (http.Response resp) {
-
         final Map<String, dynamic> productListData = json.decode(resp.body);
 
         if (productListData == null) {
