@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:udemy_app/scoped-models/main.dart';
 import 'package:udemy_app/widgets/products/products.dart';
+import 'package:udemy_app/widgets/ui_elements/logout_listtile.dart';
 
 class ProductsPage extends StatefulWidget {
   final MainModel model;
@@ -61,6 +62,8 @@ class ProductsPageState extends State<ProductsPage> {
               Navigator.pushReplacementNamed(context, '/admin');
             },
           ),
+          Divider(),
+          LogoutListTile(),
         ],
       ),
     );

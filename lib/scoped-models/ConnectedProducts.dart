@@ -1,8 +1,10 @@
 import 'package:scoped_model/scoped_model.dart';
+import 'package:udemy_app/models/auth.dart';
 import 'package:udemy_app/models/product.dart';
 import 'package:udemy_app/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 mixin ConnectedProductsModel on Model {
   List<Product> _products = [];
@@ -24,7 +26,8 @@ mixin ConnectedProductsModel on Model {
       'userId': _authenticatedUser.id
     };
     return http
-        .post('https://udemyapp-ece26.firebaseio.com/products.json',
+        .post(
+            'https://udemyapp-ece26.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
             body: json.encode(productData))
         .then(
       (http.Response resp) {
@@ -59,7 +62,22 @@ mixin ConnectedProductsModel on Model {
 
 mixin UserModel on ConnectedProductsModel {
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  User get user {
+    return _authenticatedUser;
+  }
+
+  void logout() async{
+    _authenticatedUser = null;
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+    prefs.remove('userEmail');
+    prefs.remove('userId');
+
+  }
+
+  Future<Map<String, dynamic>> authenticate(
+      String email, String password, AuthMode authMode) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> authData = {
@@ -68,29 +86,47 @@ mixin UserModel on ConnectedProductsModel {
       'returnSecureToken': true,
     };
 
-    final http.Response response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyATiPq_9ApdebJbaJAzqlftwvAi7kM3GrE',
-        body: json.encode(authData),
-        headers: {'Content-Type': 'application/json'});
+    http.Response response;
+
+    if (authMode == AuthMode.Login) {
+      response = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyATiPq_9ApdebJbaJAzqlftwvAi7kM3GrE',
+          body: json.encode(authData),
+          headers: {'Content-Type': 'application/json'});
+    } else {
+      response = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyATiPq_9ApdebJbaJAzqlftwvAi7kM3GrE',
+          body: json.encode(authData),
+          headers: {'Content-Type': 'application/json'});
+    }
 
     final Map<String, dynamic> responseData = json.decode(response.body);
 
     bool hasError = true;
-    String message = 'Somwthing went weong';
+    String message = 'Something went wrong';
     if (responseData.containsKey('idToken')) {
       hasError = false;
       message = 'Auth succeeded!';
+      _authenticatedUser = User(
+          id: responseData['localeId'],
+          email: responseData['email'],
+          token: responseData['idToken']);
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', responseData['idToken']);
+      prefs.setString('userEmail', responseData['email']);
+      prefs.setString('userId', responseData['localeId']);
     } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'no email found';
-    } else  if (responseData['error']['message'] == 'INVALID_PASSWORD') {
+    } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
       message = 'incorrect password';
+    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+      message = 'this emali already exists';
     }
 
     _isLoading = false;
     notifyListeners();
     return {'success': !hasError, 'message': message};
-
-    // _authenticatedUser = User(id: "asdasd", email: email, password: password);
   }
 
   Future<Map<String, dynamic>> signUp(String email, String password) async {
@@ -154,7 +190,7 @@ mixin ProductsModel on ConnectedProductsModel {
 
     return http
         .put(
-            'https://udemyapp-ece26.firebaseio.com/products/${getSelectedProduct().id}.json',
+            'https://udemyapp-ece26.firebaseio.com/products/${getSelectedProduct().id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updatedData))
         .then((http.Response resp) {
       _isLoading = false;
@@ -179,7 +215,8 @@ mixin ProductsModel on ConnectedProductsModel {
     notifyListeners();
 
     http
-        .delete('https://udemyapp-ece26.firebaseio.com/products/$id.json')
+        .delete(
+            'https://udemyapp-ece26.firebaseio.com/products/$id.json?auth=${_authenticatedUser.token}')
         .then((http.Response resp) {
       _isLoading = false;
       notifyListeners();
@@ -243,7 +280,10 @@ mixin ProductsModel on ConnectedProductsModel {
   Future<bool> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-    return http.get('https://udemyapp-ece26.firebaseio.com/products.json').then(
+    return http
+        .get(
+            'https://udemyapp-ece26.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
+        .then(
       (http.Response resp) {
         final Map<String, dynamic> productListData = json.decode(resp.body);
 
@@ -277,6 +317,18 @@ mixin ProductsModel on ConnectedProductsModel {
       notifyListeners();
       return false;
     });
+  }
+
+  void autoAuthenticate() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('token');
+
+    if (token != null) {
+      final String email = prefs.getString('userEmail');
+      final String userId = prefs.getString('userId');
+      _authenticatedUser = User(id: userId, email: email, token: token);
+      notifyListeners();
+    }
   }
 }
 

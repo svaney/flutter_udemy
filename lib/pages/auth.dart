@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:udemy_app/models/auth.dart';
 import 'package:udemy_app/scoped-models/main.dart';
 
 class AuthPage extends StatefulWidget {
@@ -7,11 +8,6 @@ class AuthPage extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _AuthPageState();
   }
-}
-
-enum AuthMode {
-  SignUp,
-  Login,
 }
 
 class _AuthPageState extends State<AuthPage> {
@@ -170,25 +166,20 @@ class _AuthPageState extends State<AuthPage> {
                 child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
                 color: Theme.of(context).primaryColor,
                 textColor: Colors.white,
-                onPressed: () => _onLoginClick(model.login, model.signUp),
+                onPressed: () => _onLoginClick(model.authenticate),
               );
       },
     );
   }
 
-  void _onLoginClick(Function modelLogin, Function signUp) async {
+  void _onLoginClick(Function authenticate) async {
     if (!_authFormKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _authFormKey.currentState.save();
 
-    Map<String, dynamic> responseInfo;
-
-    if (_authMode == AuthMode.Login) {
-      responseInfo =  await modelLogin(_formData['email'], _formData['password']);
-    } else {
-      responseInfo =  await signUp(_formData['email'], _formData['password']);
-    }
+    Map<String, dynamic> responseInfo = await authenticate(
+        _formData['email'], _formData['password'], _authMode);
 
     if (responseInfo['success']) {
       Navigator.pushReplacementNamed(context, '/products');

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:udemy_app/pages/product_edit.dart';
 import 'package:udemy_app/pages/product_list.dart';
 import 'package:udemy_app/scoped-models/main.dart';
+import 'package:udemy_app/widgets/ui_elements/logout_listtile.dart';
 
 class ProductAdminPage extends StatelessWidget {
   final MainModel model;
@@ -18,14 +19,8 @@ class ProductAdminPage extends StatelessWidget {
           title: Text('Manage Products'),
           bottom: TabBar(
             tabs: <Widget>[
-              Tab(
-                text: 'Edit Product',
-                icon: Icon(Icons.create),
-              ),
-              Tab(
-                text: 'My Products',
-                icon: Icon(Icons.list),
-              ),
+              Tab(text: 'Edit Product', icon: Icon(Icons.create)),
+              Tab(text: 'My Products', icon: Icon(Icons.list)),
             ],
           ),
         ),
@@ -54,6 +49,8 @@ class ProductAdminPage extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/products');
             },
           ),
+          Divider(),
+          LogoutListTile(),
         ],
       ),
     );
